@@ -1,0 +1,36 @@
+name: untitled
+description: "A new Flutter project."
+publish_to: 'none' # Prevents accidental publishing to pub.dev
+
+version: 1.0.0+1
+
+environment:
+  sdk: ">=2.18.0 <4.0.0" # Update SDK version to match Flutter's stable channel
+
+dependencies:
+  flutter:
+    sdk: flutter
+  file_manager: ^1.0.0 # For file management
+  permission_handler: ^11.3.1 # For handling permissions
+  path_provider: ^2.1.5  # For accessing file paths
+  cupertino_icons: ^1.0.8 # Cupertino Icons for iOS style icons
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0 # Recommended lints for good coding practices
+
+flutter:
+  uses-material-design: true
+
+# Uncomment and add assets or fonts if needed
+# assets:
+#   - images/a_dot_burr.jpeg
+#   - images/a_dot_ham.jpeg
+
+# fonts:
+#   - family: Schyler
+#     fonts:
+#       - asset: fonts/Schyler-Regular.ttf
+#       - asset: fonts/Schyler-Italic.ttf
+#         style: italic
