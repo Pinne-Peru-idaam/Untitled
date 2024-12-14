@@ -14,8 +14,8 @@ class GradientBackground extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         gradient: RadialGradient(
-          center: Alignment(0.8, -0.6), // Position towards top-left
-          radius: 1.8,
+          center: Alignment(1.2, -0.6), // Position towards top-left
+          radius: 1.6,
           colors: [
             Color(0xFF1A3048), // Dark blue
             Color(0xFF0D1B29), // Darker blue
@@ -24,7 +24,7 @@ class GradientBackground extends StatelessWidget {
             Color(0xFF010204), // Almost black with green tint at bottom
           ],
           stops: [0.2, 0.4, 0.6, 0.8, 1.0],
-          focal: Alignment(0.8, -0.4),
+          focal: Alignment(1, -0.6),
           focalRadius: 0.2,
         ),
       ),

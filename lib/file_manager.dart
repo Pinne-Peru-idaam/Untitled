@@ -6,12 +6,12 @@ class FileManager extends StatefulWidget {
   const FileManager({super.key});
 
   @override
-  FileManagerState createState() => FileManagerState(); // Remove underscore
+  FileManagerState createState() => FileManagerState();
 }
 
 class FileManagerState extends State<FileManager> {
-  List<FileSystemEntity> _files = [];
-  String _currentPath = '';
+  List<FileSystemEntity> _files = []; // Initialize empty list
+  String _currentPath = '/storage/emulated/0'; // Initialize with default path
 
   @override
   void initState() {
@@ -25,7 +25,7 @@ class FileManagerState extends State<FileManager> {
         await Permission.storage.request();
         await Permission.manageExternalStorage.request();
       }
-      getFiles('/storage/emulated/0');
+      getFiles(_currentPath); // Use initial path
     }
   }
 
@@ -37,9 +37,12 @@ class FileManagerState extends State<FileManager> {
         _files = dir.listSync();
       });
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error accessing path: $e')),
-      );
+      if (mounted) {
+        // Check if widget is still mounted
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error accessing path: $e')),
+        );
+      }
     }
   }
 
@@ -47,12 +50,9 @@ class FileManagerState extends State<FileManager> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        // Path navigator
         Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Text('Current Path: $_currentPath'),
+          padding: const EdgeInsets.all(16.0),
         ),
-        // File list
         Expanded(
           child: ListView.builder(
             itemCount: _files.length,
@@ -62,19 +62,28 @@ class FileManagerState extends State<FileManager> {
               final isDirectory = file is Directory;
 
               return ListTile(
-                leading: Icon(
-                  isDirectory ? Icons.folder : _getFileIcon(fileName),
-                  color: isDirectory ? Colors.amber : Colors.blue,
+                leading: isDirectory
+                    ? Image.asset(
+                        'lib/assets/folder-closed.png', // Your folder icon
+                        width: 24,
+                        height: 24,
+                        color: Colors.amber,
+                      )
+                    : _getFileIcon(fileName),
+                title: Text(
+                  fileName,
+                  style: const TextStyle(color: Colors.white),
                 ),
-                title: Text(fileName),
                 subtitle: !isDirectory
-                    ? Text('Size: ${_getFileSize(file as File)}')
+                    ? Text(
+                        'Size: ${_getFileSize(file as File)}',
+                        style: TextStyle(color: Colors.grey[400]),
+                      )
                     : null,
                 onTap: () {
                   if (isDirectory) {
                     getFiles(file.path);
                   } else {
-                    // Handle file tap
                     _showFileOptions(file);
                   }
                 },
@@ -86,24 +95,40 @@ class FileManagerState extends State<FileManager> {
     );
   }
 
-  IconData _getFileIcon(String fileName) {
+  Widget _getFileIcon(String fileName) {
     final extension = fileName.split('.').last.toLowerCase();
+    String imagePath;
+
     switch (extension) {
       case 'pdf':
-        return Icons.picture_as_pdf;
+        imagePath = 'lib/assets/file.png'; // Your PDF icon
+        break;
       case 'jpg':
       case 'jpeg':
       case 'png':
-        return Icons.image;
+        imagePath = 'lib/assets/image.png'; // Your image icon
+        break;
       case 'mp3':
       case 'wav':
-        return Icons.music_note;
+        imagePath = 'lib/assets/Vector.png'; // Your audio icon
+        break;
       case 'mp4':
       case 'mov':
-        return Icons.video_library;
+        imagePath = 'lib/assets/clapperboard.png'; // Your video icon
+        break;
+      case 'apk':
+        imagePath = 'lib/assets/apk.png'; // Your APK icon
+        break;
       default:
-        return Icons.insert_drive_file;
+        imagePath = 'lib/assets/file.png'; // Your default file icon
     }
+
+    return Image.asset(
+      imagePath,
+      width: 24,
+      height: 24,
+      color: Colors.white, // Optional: tint the icon
+    );
   }
 
   String _getFileSize(File file) {
@@ -123,12 +148,13 @@ class FileManagerState extends State<FileManager> {
   void _showFileOptions(FileSystemEntity file) {
     showModalBottomSheet(
       context: context,
+      backgroundColor: const Color(0xFF0F1418),
       builder: (context) => Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           ListTile(
-            leading: const Icon(Icons.delete),
-            title: const Text('Delete'),
+            leading: const Icon(Icons.delete, color: Colors.white),
+            title: const Text('Delete', style: TextStyle(color: Colors.white)),
             onTap: () async {
               Navigator.pop(context);
               await file.delete();
@@ -136,33 +162,42 @@ class FileManagerState extends State<FileManager> {
             },
           ),
           ListTile(
-            leading: const Icon(Icons.info),
-            title: const Text('Details'),
+            leading: const Icon(Icons.info, color: Colors.white),
+            title: const Text('Details', style: TextStyle(color: Colors.white)),
             onTap: () {
               Navigator.pop(context);
-              // Show file details
-              showDialog(
-                context: context,
-                builder: (context) => AlertDialog(
-                  title: const Text('File Details'),
-                  content: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('Name: ${file.path.split('/').last}'),
-                      Text('Path: ${file.path}'),
-                      if (file is File) Text('Size: ${_getFileSize(file)}'),
-                    ],
-                  ),
-                  actions: [
-                    TextButton(
-                      onPressed: () => Navigator.pop(context),
-                      child: const Text('Close'),
-                    ),
-                  ],
-                ),
-              );
+              _showDetailsDialog(file);
             },
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showDetailsDialog(FileSystemEntity file) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: const Color(0xFF0F1418),
+        title:
+            const Text('File Details', style: TextStyle(color: Colors.white)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Name: ${file.path.split('/').last}',
+                style: const TextStyle(color: Colors.white)),
+            Text('Path: ${file.path}',
+                style: const TextStyle(color: Colors.white)),
+            if (file is File)
+              Text('Size: ${_getFileSize(file)}',
+                  style: const TextStyle(color: Colors.white)),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Close', style: TextStyle(color: Colors.blue)),
           ),
         ],
       ),

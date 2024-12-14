@@ -13,6 +13,12 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: ThemeData(
+        fontFamily: 'Poppins',
+        textTheme: TextTheme(
+          bodyLarge: TextStyle(fontFamily: 'Poppins'),
+          bodyMedium: TextStyle(fontFamily: 'Poppins'),
+          titleLarge: TextStyle(fontFamily: 'Poppins'),
+        ),
         brightness: Brightness.dark,
         primaryColor: Color(0xFF1E2746),
         scaffoldBackgroundColor: Colors.black,

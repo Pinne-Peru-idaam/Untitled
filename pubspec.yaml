@@ -27,9 +27,15 @@ flutter:
   assets:
     - lib/assets/     # Corrected assets path  
 
-# fonts:
-#   - family: Schyler
-#     fonts:
-#       - asset: fonts/Schyler-Regular.ttf
-#       - asset: fonts/Schyler-Italic.ttf
-#         style: italic
+  fonts:
+    - family: Poppins
+      fonts:
+        - asset: lib/assets/font/poppins/Poppins-Regular.ttf
+        - asset: lib/assets/font/poppins/Poppins-Medium.ttf
+          weight: 500
+        - asset: lib/assets/font/poppins/Poppins-SemiBold.ttf
+          weight: 600
+        - asset: lib/assets/font/poppins/Poppins-Bold.ttf
+          weight: 700
+        - asset: lib/assets/font/poppins/Poppins-Italic.ttf
+          style: italic
