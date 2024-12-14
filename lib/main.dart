@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'home.dart'; // Importing the HomePage class
 
+// lib/main.dart
 void main() {
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -11,11 +12,12 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'My Flutter App',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        brightness: Brightness.dark,
+        primaryColor: Color(0xFF1E2746),
+        scaffoldBackgroundColor: Colors.black,
       ),
-      home: const HomePage(), // Setting HomePage as the home widget
+      home: HomePage(),
     );
   }
 }
