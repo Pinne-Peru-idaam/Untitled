@@ -1,3 +1,6 @@
+import 'dart:io';
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:untitled/pages/categories/apks/apks_page.dart';
 import 'package:untitled/pages/categories/audios/audios_page.dart';
@@ -5,10 +8,56 @@ import 'package:untitled/pages/categories/documents/documents_page.dart';
 import 'package:untitled/pages/categories/downloads/downloads_page.dart';
 import 'package:untitled/pages/categories/images/images_page.dart';
 import 'package:untitled/pages/categories/videos/videos_page.dart';
-import 'category_card.dart';
+import 'package:untitled/pages/home/widgets/category_card.dart';
 
-class CategoriesSection extends StatelessWidget {
+class CategoriesSection extends StatefulWidget {
+  // Change to StatefulWidget
   const CategoriesSection({super.key});
+
+  @override
+  State<CategoriesSection> createState() => _CategoriesSectionState();
+}
+
+class _CategoriesSectionState extends State<CategoriesSection> {
+  String imagesSize = '0 MB';
+  String videosSize = '0 MB';
+  String documentsSize = '0 MB';
+  String audiosSize = '0 MB';
+  String downloadsSize = '0 MB';
+  String apksSize = '0 MB';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSizes();
+  }
+
+  Future<void> _loadSizes() async {
+    // Load Downloads size
+    try {
+      final directory = Directory('/storage/emulated/0/Download');
+      if (await directory.exists()) {
+        int totalSize = 0;
+        await for (var entity in directory.list()) {
+          if (entity is File) {
+            totalSize += await entity.length();
+          }
+        }
+        setState(() {
+          downloadsSize = _formatSize(totalSize);
+        });
+      }
+    } catch (e) {
+      print('Error loading downloads size: $e');
+    }
+  }
+
+  String _formatSize(int bytes) {
+    if (bytes <= 0) return '0 B';
+    const suffixes = ['B', 'KB', 'MB', 'GB'];
+    var i = (log(bytes) / log(1024)).floor();
+    return '${(bytes / pow(1024, i)).toStringAsFixed(2)} ${suffixes[i]}';
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +81,7 @@ class CategoriesSection extends StatelessWidget {
             children: [
               CategoryCard(
                 title: 'Images',
-                size: '456 MB',
+                size: imagesSize,
                 imagePath: 'lib/assets/icons/image.png',
                 onTap: () => Navigator.push(
                     context,
@@ -41,7 +90,7 @@ class CategoriesSection extends StatelessWidget {
               ),
               CategoryCard(
                 title: 'Videos',
-                size: '1.2 GB',
+                size: videosSize,
                 imagePath: 'lib/assets/icons/clapperboard.png',
                 onTap: () => Navigator.push(
                     context,
@@ -50,7 +99,7 @@ class CategoriesSection extends StatelessWidget {
               ),
               CategoryCard(
                 title: 'Documents',
-                size: '456 MB',
+                size: documentsSize,
                 imagePath: 'lib/assets/icons/file.png',
                 onTap: () => Navigator.push(
                     context,
@@ -59,7 +108,7 @@ class CategoriesSection extends StatelessWidget {
               ),
               CategoryCard(
                 title: 'Audios',
-                size: '228 MB',
+                size: audiosSize,
                 imagePath: 'lib/assets/icons/Vector.png',
                 onTap: () => Navigator.push(
                     context,
@@ -68,7 +117,7 @@ class CategoriesSection extends StatelessWidget {
               ),
               CategoryCard(
                 title: 'Downloads',
-                size: '0 GB',
+                size: downloadsSize, // Using the calculated size
                 imagePath: 'lib/assets/icons/download.png',
                 onTap: () => Navigator.push(
                     context,
@@ -77,7 +126,7 @@ class CategoriesSection extends StatelessWidget {
               ),
               CategoryCard(
                 title: 'Apks',
-                size: '0',
+                size: apksSize,
                 imagePath: 'lib/assets/icons/apk.png',
                 onTap: () => Navigator.push(context,
                     MaterialPageRoute(builder: (context) => const ApksPage())),
