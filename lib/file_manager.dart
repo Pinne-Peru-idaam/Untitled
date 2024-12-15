@@ -64,7 +64,7 @@ class FileManagerState extends State<FileManager> {
               return ListTile(
                 leading: isDirectory
                     ? Image.asset(
-                        'lib/assets/folder-closed.png', // Your folder icon
+                        'lib/assets/icons/folder-closed.png', // Your folder icon
                         width: 24,
                         height: 24,
                         color: Colors.amber,
@@ -101,26 +101,26 @@ class FileManagerState extends State<FileManager> {
 
     switch (extension) {
       case 'pdf':
-        imagePath = 'lib/assets/file.png'; // Your PDF icon
+        imagePath = 'lib/assets/icons/file.png'; // Your PDF icon
         break;
       case 'jpg':
       case 'jpeg':
       case 'png':
-        imagePath = 'lib/assets/image.png'; // Your image icon
+        imagePath = 'lib/assets/icons/image.png'; // Your image icon
         break;
       case 'mp3':
       case 'wav':
-        imagePath = 'lib/assets/Vector.png'; // Your audio icon
+        imagePath = 'lib/assets/icons/Vector.png'; // Your audio icon
         break;
       case 'mp4':
       case 'mov':
-        imagePath = 'lib/assets/clapperboard.png'; // Your video icon
+        imagePath = 'lib/assets/icons/clapperboard.png'; // Your video icon
         break;
       case 'apk':
-        imagePath = 'lib/assets/apk.png'; // Your APK icon
+        imagePath = 'lib/assets/icons/apk.png'; // Your APK icon
         break;
       default:
-        imagePath = 'lib/assets/file.png'; // Your default file icon
+        imagePath = 'lib/assets/icons/file.png'; // Your default file icon
     }
 
     return Image.asset(

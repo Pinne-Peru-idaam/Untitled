@@ -1,7 +1,7 @@
 // lib/pages/home_page.dart
 import 'package:flutter/material.dart';
 import 'package:untitled/pages/categories/apks/apks_page.dart';
-import 'package:untitled/assets/storage_screen.dart';
+import 'package:untitled/storage_screen.dart';
 import 'package:untitled/pages/categories/audios/audios_page.dart';
 import 'package:untitled/pages/categories/documents/documents_page.dart';
 import 'package:untitled/pages/categories/downloads/downloads_page.dart';
@@ -244,12 +244,12 @@ class HomePage extends StatelessWidget {
           crossAxisSpacing: 20,
           childAspectRatio: 2.4,
           children: [
-            _categoryCard('Images', '456 MB', 'lib/assets/image.png', context),
-            _categoryCard('Videos', '1.2 GB', 'lib/assets/clapperboard.png', context),
-            _categoryCard('Documents', '456 MB', 'lib/assets/file.png', context),
-            _categoryCard('Audios', '228 MB', 'lib/assets/Vector.png', context),
-            _categoryCard('Downloads', '0 GB', 'lib/assets/download.png', context),
-            _categoryCard('Apks', '0', 'lib/assets/apk.png', context),
+            _categoryCard('Images', '456 MB', 'lib/assets/icons/image.png', context),
+            _categoryCard('Videos', '1.2 GB', 'lib/assets/icons/clapperboard.png', context),
+            _categoryCard('Documents', '456 MB', 'lib/assets/icons/file.png', context),
+            _categoryCard('Audios', '228 MB', 'lib/assets/icons/Vector.png', context),
+            _categoryCard('Downloads', '0 GB', 'lib/assets/icons/download.png', context),
+            _categoryCard('Apks', '0', 'lib/assets/icons/apk.png', context),
           ],
         ),
       ],
@@ -299,7 +299,7 @@ Widget _allStorage(BuildContext context) {
         mainAxisSize: MainAxisSize.min,
         children: [
           Image.asset(
-            'lib/assets/Vector2.png',
+            'lib/assets/icons/Vector2.png',
             width: 20,
             height: 20,
             color: Colors.white,
