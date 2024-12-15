@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:untitled/storage_screen.dart';
+import 'package:untitled/pages/categories/storage/file_manager.dart';
 import 'category_card.dart';
 
 class StorageSection extends StatelessWidget {
-  const StorageSection({Key? key}) : super(key: key);
+  const StorageSection({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +32,7 @@ class StorageSection extends StatelessWidget {
                 onTap: () => Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => const StorageScreen())),
+                        builder: (context) => const FileManager())),
               ),
             ],
           ),

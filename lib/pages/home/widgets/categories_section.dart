@@ -8,7 +8,7 @@ import 'package:untitled/pages/categories/videos/videos_page.dart';
 import 'category_card.dart';
 
 class CategoriesSection extends StatelessWidget {
-  const CategoriesSection({Key? key}) : super(key: key);
+  const CategoriesSection({super.key});
 
   @override
   Widget build(BuildContext context) {

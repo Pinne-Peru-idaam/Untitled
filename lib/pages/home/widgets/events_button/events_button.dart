@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class EventsButton extends StatelessWidget {
-  const EventsButton({Key? key}) : super(key: key);
+  const EventsButton({super.key});
 
   @override
   Widget build(BuildContext context) {
