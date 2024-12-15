@@ -34,37 +34,53 @@ class CategoriesSection extends StatelessWidget {
                 title: 'Images',
                 size: '456 MB',
                 imagePath: 'lib/assets/icons/image.png',
-                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const ImagesPage())),
+                onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const ImagesPage())),
               ),
               CategoryCard(
                 title: 'Videos',
                 size: '1.2 GB',
                 imagePath: 'lib/assets/icons/clapperboard.png',
-                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const VideosPage())),
+                onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const VideosPage())),
               ),
               CategoryCard(
                 title: 'Documents',
                 size: '456 MB',
                 imagePath: 'lib/assets/icons/file.png',
-                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const DocumentsPage())),
+                onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const DocumentsPage())),
               ),
               CategoryCard(
                 title: 'Audios',
                 size: '228 MB',
                 imagePath: 'lib/assets/icons/Vector.png',
-                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const AudiosPage())),
+                onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const AudiosPage())),
               ),
               CategoryCard(
                 title: 'Downloads',
                 size: '0 GB',
                 imagePath: 'lib/assets/icons/download.png',
-                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const DownloadsPage())),
+                onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const DownloadsPage())),
               ),
               CategoryCard(
                 title: 'Apks',
                 size: '0',
                 imagePath: 'lib/assets/icons/apk.png',
-                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const ApksPage())),
+                onTap: () => Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => const ApksPage())),
               ),
             ],
           ),

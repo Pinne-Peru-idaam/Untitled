@@ -28,8 +28,11 @@ class StorageSection extends StatelessWidget {
               CategoryCard(
                 title: 'Internal Storage',
                 size: '64 GB',
-                imagePath: 'lib/assets/file.png',
-                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const StorageScreen())),
+                imagePath: 'lib/assets/icons/file.png',
+                onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const StorageScreen())),
               ),
             ],
           ),
