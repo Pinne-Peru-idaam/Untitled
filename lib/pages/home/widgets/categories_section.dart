@@ -42,7 +42,30 @@ class CategoriesSection extends StatelessWidget {
                 imagePath: 'lib/assets/icons/clapperboard.png',
                 onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const VideosPage())),
               ),
-              // Add other category cards similarly
+              CategoryCard(
+                title: 'Documents',
+                size: '456 MB',
+                imagePath: 'lib/assets/icons/file.png',
+                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const DocumentsPage())),
+              ),
+              CategoryCard(
+                title: 'Audios',
+                size: '228 MB',
+                imagePath: 'lib/assets/icons/Vector.png',
+                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const AudiosPage())),
+              ),
+              CategoryCard(
+                title: 'Downloads',
+                size: '0 GB',
+                imagePath: 'lib/assets/icons/download.png',
+                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const DownloadsPage())),
+              ),
+              CategoryCard(
+                title: 'Apks',
+                size: '0',
+                imagePath: 'lib/assets/icons/apk.png',
+                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const ApksPage())),
+              ),
             ],
           ),
         ],
