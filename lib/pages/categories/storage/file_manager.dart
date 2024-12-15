@@ -267,42 +267,80 @@ class FileManagerState extends State<FileManager> {
         ),
         body: isLoading
             ? const Center(child: CircularProgressIndicator())
-            : ListView.builder(
-                itemCount: files.length,
-                itemBuilder: (context, index) {
-                  final entity = files[index];
-                  final name = entity.path.split('/').last;
-                  final isDirectory = entity is Directory;
+            : Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: GridView.builder(
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    childAspectRatio: 1,
+                    crossAxisSpacing: 10,
+                    mainAxisSpacing: 10,
+                  ),
+                  itemCount: files.length,
+                  itemBuilder: (context, index) {
+                    final entity = files[index];
+                    final name = entity.path.split('/').last;
+                    final isDirectory = entity is Directory;
 
-                  return ListTile(
-                    leading: isDirectory
-                        ? Image.asset(
-                            AppIcons.folder,
-                            width: 40,
-                            height: 40,
-                          )
-                        : _getFileIcon(name),
-                    title: Text(name),
-                    subtitle: FutureBuilder<FileStat>(
-                      future: entity.stat(),
-                      builder: (context, snapshot) {
-                        if (!snapshot.hasData) return const Text('Loading...');
-                        final stat = snapshot.data!;
-                        if (isDirectory) {
-                          return Text('Modified: ${stat.modified.toString()}');
-                        } else {
-                          return Text('Size: ${_formatSize(stat.size)}');
-                        }
-                      },
-                    ),
-                    onTap: () => _handleFileTap(entity),
-                    onLongPress: () {
-                      if (entity is File) {
-                        _showFileOptions(entity);
-                      }
-                    },
-                  );
-                },
+                    return Card(
+                      elevation: 2,
+                      child: InkWell(
+                        onTap: () => _handleFileTap(entity),
+                        onLongPress: () {
+                          if (entity is File) {
+                            _showFileOptions(entity);
+                          }
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              isDirectory
+                                  ? Image.asset(
+                                      AppIcons.folder,
+                                      width: 60,
+                                      height: 60,
+                                      color: Colors.amber,
+                                    )
+                                  : _getFileIcon(name),
+                              Text(
+                                name,
+                                textAlign: TextAlign.center,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                    fontSize: 16, fontWeight: FontWeight.w500),
+                              ),
+                              const SizedBox(height: 10),
+                              FutureBuilder<FileStat>(
+                                future: entity.stat(),
+                                builder: (context, snapshot) {
+                                  if (!snapshot.hasData) {
+                                    return const Text('Loading...',
+                                        style: TextStyle(fontSize: 10));
+                                  }
+                                  final stat = snapshot.data!;
+                                  if (isDirectory) {
+                                    return Text(
+                                      'Modified: ${stat.modified.toString()}',
+                                      style: const TextStyle(fontSize: 10),
+                                    );
+                                  } else {
+                                    return Text(
+                                      _formatSize(stat.size),
+                                      style: const TextStyle(fontSize: 10),
+                                    );
+                                  }
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
               ),
       ),
     );
