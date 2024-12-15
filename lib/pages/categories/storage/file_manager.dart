@@ -80,7 +80,7 @@ class FileManagerState extends State<FileManager> {
       });
       _loadFiles();
     } else if (entity is File) {
-      _showFileOptions(entity);
+      OpenFile.open(entity.path);
     }
   }
 
@@ -132,7 +132,8 @@ class FileManagerState extends State<FileManager> {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Delete File'),
-        content: Text('Are you sure you want to delete ${file.path.split('/').last}?'),
+        content: Text(
+            'Are you sure you want to delete ${file.path.split('/').last}?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
@@ -196,7 +197,7 @@ class FileManagerState extends State<FileManager> {
   Widget _getFileIcon(String fileName) {
     final extension = fileName.split('.').last.toLowerCase();
     String iconPath;
-    
+
     switch (extension) {
       case 'apk':
         iconPath = AppIcons.apk;
@@ -234,57 +235,76 @@ class FileManagerState extends State<FileManager> {
     );
   }
 
+  Future<bool> _onWillPop() async {
+    if (currentPath == '/storage/emulated/0') {
+      return true;
+    }
+    setState(() {
+      currentPath = Directory(currentPath).parent.path;
+    });
+    _loadFiles();
+    return false;
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('File Manager'),
-        leading: currentPath != '/storage/emulated/0'
-            ? IconButton(
-                icon: const Icon(Icons.arrow_back),
-                onPressed: () {
-                  setState(() {
-                    currentPath = Directory(currentPath).parent.path;
-                  });
-                  _loadFiles();
-                },
-              )
-            : null,
-      ),
-      body: isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : ListView.builder(
-              itemCount: files.length,
-              itemBuilder: (context, index) {
-                final entity = files[index];
-                final name = entity.path.split('/').last;
-                final isDirectory = entity is Directory;
+    return WillPopScope(
+      onWillPop: _onWillPop,
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('File Manager'),
+          leading: currentPath != '/storage/emulated/0'
+              ? IconButton(
+                  icon: const Icon(Icons.arrow_back),
+                  onPressed: () {
+                    setState(() {
+                      currentPath = Directory(currentPath).parent.path;
+                    });
+                    _loadFiles();
+                  },
+                )
+              : null,
+        ),
+        body: isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : ListView.builder(
+                itemCount: files.length,
+                itemBuilder: (context, index) {
+                  final entity = files[index];
+                  final name = entity.path.split('/').last;
+                  final isDirectory = entity is Directory;
 
-                return ListTile(
-                  leading: isDirectory
-                      ? Image.asset(
-                          AppIcons.folder,
-                          width: 40,
-                          height: 40,
-                        )
-                      : _getFileIcon(name),
-                  title: Text(name),
-                  subtitle: FutureBuilder<FileStat>(
-                    future: entity.stat(),
-                    builder: (context, snapshot) {
-                      if (!snapshot.hasData) return const Text('Loading...');
-                      final stat = snapshot.data!;
-                      if (isDirectory) {
-                        return Text('Modified: ${stat.modified.toString()}');
-                      } else {
-                        return Text('Size: ${_formatSize(stat.size)}');
+                  return ListTile(
+                    leading: isDirectory
+                        ? Image.asset(
+                            AppIcons.folder,
+                            width: 40,
+                            height: 40,
+                          )
+                        : _getFileIcon(name),
+                    title: Text(name),
+                    subtitle: FutureBuilder<FileStat>(
+                      future: entity.stat(),
+                      builder: (context, snapshot) {
+                        if (!snapshot.hasData) return const Text('Loading...');
+                        final stat = snapshot.data!;
+                        if (isDirectory) {
+                          return Text('Modified: ${stat.modified.toString()}');
+                        } else {
+                          return Text('Size: ${_formatSize(stat.size)}');
+                        }
+                      },
+                    ),
+                    onTap: () => _handleFileTap(entity),
+                    onLongPress: () {
+                      if (entity is File) {
+                        _showFileOptions(entity);
                       }
                     },
-                  ),
-                  onTap: () => _handleFileTap(entity),
-                );
-              },
-            ),
+                  );
+                },
+              ),
+      ),
     );
   }
 }
