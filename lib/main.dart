@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'home.dart'; // Importing the HomePage class
+import 'pages/home/home_page.dart'; // Importing the HomePage class
 
 // lib/main.dart
 void main() {

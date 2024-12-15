@@ -1,12 +1,12 @@
 // lib/pages/home_page.dart
 import 'package:flutter/material.dart';
-import 'package:untitled/apks_page.dart';
+import 'package:untitled/pages/categories/apks_page.dart';
 import 'package:untitled/assets/storage_screen.dart';
-import 'package:untitled/audios_page.dart';
-import 'package:untitled/documents_page.dart';
-import 'package:untitled/downloads_pages.dart';
-import 'package:untitled/images_page.dart';
-import 'package:untitled/videos_page.dart';
+import 'package:untitled/pages/categories/audios_page.dart';
+import 'package:untitled/pages/categories/documents_page.dart';
+import 'package:untitled/pages/categories/downloads_page.dart';
+import 'package:untitled/pages/categories/images_page.dart';
+import 'package:untitled/pages/categories/videos_page.dart';
 import 'package:untitled/widgets/gradient_background.dart';
 
 class HomePage extends StatelessWidget {
