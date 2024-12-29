@@ -2,8 +2,13 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+<<<<<<< HEAD
       <module fileurl="file://$PROJECT_DIR$/untitled.iml" filepath="$PROJECT_DIR$/untitled.iml" />
       <module fileurl="file://$PROJECT_DIR$/android/untitled_android.iml" filepath="$PROJECT_DIR$/android/untitled_android.iml" />
+=======
+      <module fileurl="file://$PROJECT_DIR$/untitle.iml" filepath="$PROJECT_DIR$/untitle.iml" />
+      <module fileurl="file://$PROJECT_DIR$/android/untitle_android.iml" filepath="$PROJECT_DIR$/android/untitle_android.iml" />
+>>>>>>> 00dce64d13944ce069a5a9fe8dfdffb245932dbe
     </modules>
   </component>
 </project>

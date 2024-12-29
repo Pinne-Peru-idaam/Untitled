@@ -1,6 +1,11 @@
 {
+<<<<<<< HEAD
     "name": "untitled",
     "short_name": "untitled",
+=======
+    "name": "untitle",
+    "short_name": "untitle",
+>>>>>>> 00dce64d13944ce069a5a9fe8dfdffb245932dbe
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

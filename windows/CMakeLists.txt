@@ -1,10 +1,18 @@
 # Project-level configuration.
 cmake_minimum_required(VERSION 3.14)
+<<<<<<< HEAD
 project(untitled LANGUAGES CXX)
 
 # The name of the executable created for the application. Change this to change
 # the on-disk name of your application.
 set(BINARY_NAME "untitled")
+=======
+project(untitle LANGUAGES CXX)
+
+# The name of the executable created for the application. Change this to change
+# the on-disk name of your application.
+set(BINARY_NAME "untitle")
+>>>>>>> 00dce64d13944ce069a5a9fe8dfdffb245932dbe
 
 # Explicitly opt in to modern CMake behaviors to avoid warnings with recent
 # versions of CMake.

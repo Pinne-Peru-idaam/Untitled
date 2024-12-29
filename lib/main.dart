@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'pages/home/home_page.dart'; // Importing the HomePage class
 
 // lib/main.dart
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Future.delayed(Duration(milliseconds: 100));
   runApp(MyApp());
 }
 
