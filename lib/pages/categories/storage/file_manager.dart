@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'dart:io';
-import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -14,34 +13,106 @@ class FileManager extends StatefulWidget {
 class _FileManagerState extends State<FileManager> {
   late Directory currentDirectory;
   List<Directory> navigationStack = [];
+  bool _hasPermission = false;
 
   @override
   void initState() {
     super.initState();
-    _initializeDirectory();
+    _checkAndRequestPermissions();
+  }
+
+  Future<void> _checkAndRequestPermissions() async {
+    if (Platform.isAndroid) {
+      if (await _requestPermissions()) {
+        await _initializeDirectory();
+      }
+    } else {
+      await _initializeDirectory();
+    }
+  }
+
+  Future<bool> _requestPermissions() async {
+    final storage = await Permission.storage.request();
+    final manageStorage = await Permission.manageExternalStorage.request();
+
+    setState(() {
+      _hasPermission = storage.isGranted || manageStorage.isGranted;
+    });
+
+    if (!_hasPermission) {
+      if (context.mounted) {
+        await showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Storage Permission Required'),
+            content: const Text(
+                'This app needs storage access to manage files. Please grant permission in settings.'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Cancel'),
+              ),
+              TextButton(
+                onPressed: () => openAppSettings(),
+                child: const Text('Open Settings'),
+              ),
+            ],
+          ),
+        );
+      }
+    }
+
+    return _hasPermission;
   }
 
   Future<void> _initializeDirectory() async {
-  if (Platform.isAndroid) {
-    final status = await Permission.storage.request();
-    if (status.isGranted) {
-      currentDirectory = Directory('/storage/emulated/0');
-    } else {
+    try {
+      if (Platform.isAndroid && _hasPermission) {
+        currentDirectory = Directory('/storage/emulated/0');
+        await currentDirectory.list().first;
+      } else {
+        currentDirectory = await getApplicationDocumentsDirectory();
+      }
+      setState(() {});
+    } catch (e) {
       currentDirectory = await getApplicationDocumentsDirectory();
+      setState(() {});
     }
-  } else {
-    currentDirectory = await getApplicationDocumentsDirectory();
   }
-  setState(() {});
-}
 
   Future<List<FileSystemEntity>> _getEntities() async {
     try {
-      final entities = await currentDirectory.list().toList();
-      return entities..sort((a, b) => a.path.toLowerCase().compareTo(b.path.toLowerCase()));
+      final List<FileSystemEntity> entities = await currentDirectory.list().toList();
+      entities.sort((a, b) {
+        bool aIsDir = FileSystemEntity.isDirectorySync(a.path);
+        bool bIsDir = FileSystemEntity.isDirectorySync(b.path);
+        
+        if (aIsDir && !bIsDir) return -1;
+        if (!aIsDir && bIsDir) return 1;
+        
+        return a.path.toLowerCase().compareTo(b.path.toLowerCase());
+      });
+      return entities;
     } catch (e) {
       throw Exception('Failed to list directory contents: $e');
     }
+  }
+
+  String _getFileSize(FileSystemEntity entity) {
+    try {
+      if (entity is File) {
+        int bytes = entity.lengthSync();
+        if (bytes < 1024) return '$bytes B';
+        if (bytes < 1024 * 1024) return '${(bytes / 1024).toStringAsFixed(1)} KB';
+        if (bytes < 1024 * 1024 * 1024) {
+          return '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
+        }
+        return '${(bytes / (1024 * 1024 * 1024)).toStringAsFixed(1)} GB';
+      }
+    } catch (e) {
+      return '';
+    }
+    return '';
   }
 
   void _navigateToDirectory(FileSystemEntity entity) {
@@ -59,36 +130,162 @@ class _FileManagerState extends State<FileManager> {
     }
   }
 
-  Future<void> _deleteFile(FileSystemEntity entity) async {
+  Future<void> _createNewFolder() async {
+    String? folderName;
+    
+    if (context.mounted) {
+      await showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Create New Folder'),
+          content: TextField(
+            autofocus: true,
+            decoration: const InputDecoration(hintText: 'Folder Name'),
+            onChanged: (value) => folderName = value,
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+                if (folderName != null && folderName!.isNotEmpty) {
+                  Directory('${currentDirectory.path}/$folderName')
+                      .create()
+                      .then((_) => setState(() {}))
+                      .catchError((e) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Error creating folder: $e')),
+                    );
+                  });
+                }
+              },
+              child: const Text('Create'),
+            ),
+          ],
+        ),
+      );
+    }
+  }
+
+  void _showEntityActions(FileSystemEntity entity) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(entity.path.split('/').last),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              _deleteEntity(entity);
+            },
+            child: const Text('Delete'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              _renameEntity(entity);
+            },
+            child: const Text('Rename'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _deleteEntity(FileSystemEntity entity) async {
+    bool confirm = await _confirmDelete(entity);
+    if (!confirm) return;
+
     try {
       await entity.delete(recursive: true);
       setState(() {});
     } catch (e) {
-      _showError('Failed to delete: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error deleting: $e')),
+        );
+      }
     }
   }
 
-  Future<void> _createFolder(String name) async {
-    try {
-      final newDir = Directory(path.join(currentDirectory.path, name));
-      await newDir.create();
-      setState(() {});
-    } catch (e) {
-      _showError('Failed to create folder: $e');
-    }
-  }
-
-  void _showError(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message), backgroundColor: Colors.red),
+  Future<bool> _confirmDelete(FileSystemEntity entity) async {
+    bool result = false;
+    await showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Confirm Delete'),
+        content: Text('Are you sure you want to delete ${entity.path.split('/').last}?'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              result = false;
+              Navigator.pop(context);
+            },
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              result = true;
+              Navigator.pop(context);
+            },
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
     );
+    return result;
+  }
+
+  Future<void> _renameEntity(FileSystemEntity entity) async {
+    String? newName;
+    
+    if (context.mounted) {
+      await showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Rename'),
+          content: TextField(
+            autofocus: true,
+            decoration: const InputDecoration(hintText: 'New Name'),
+            onChanged: (value) => newName = value,
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+                if (newName != null && newName!.isNotEmpty) {
+                  String newPath = '${entity.parent.path}/$newName';
+                  entity.rename(newPath).then((_) => setState(() {})).catchError((e) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Error renaming: $e')),
+                    );
+                  });
+                }
+              },
+              child: const Text('Rename'),
+            ),
+          ],
+        ),
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(path.basename(currentDirectory.path)),
+        title: Text(currentDirectory.path.split('/').last),
         leading: navigationStack.isNotEmpty
             ? IconButton(
                 icon: const Icon(Icons.arrow_back),
@@ -98,95 +295,59 @@ class _FileManagerState extends State<FileManager> {
         actions: [
           IconButton(
             icon: const Icon(Icons.create_new_folder),
-            onPressed: () => _showCreateFolderDialog(),
+            onPressed: _createNewFolder,
           ),
         ],
       ),
-      body: FutureBuilder<List<FileSystemEntity>>(
-        future: _getEntities(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
-          if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
-          }
-          if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Center(child: Text('Empty folder'));
-          }
+      body: !_hasPermission && Platform.isAndroid
+          ? Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text('Storage permission is required'),
+                  ElevatedButton(
+                    onPressed: _checkAndRequestPermissions,
+                    child: const Text('Grant Permission'),
+                  ),
+                ],
+              ),
+            )
+          : FutureBuilder<List<FileSystemEntity>>(
+              future: _getEntities(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                if (snapshot.hasError) {
+                  return Center(child: Text('Error: ${snapshot.error}'));
+                }
+                if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return const Center(child: Text('Empty folder'));
+                }
 
-          final entities = snapshot.data!;
-          return ListView.builder(
-            itemCount: entities.length,
-            itemBuilder: (context, index) {
-              final entity = entities[index];
-              final isDirectory = FileSystemEntity.isDirectorySync(entity.path);
-              
-              return Dismissible(
-                key: Key(entity.path),
-                background: Container(
-                  color: Colors.red,
-                  alignment: Alignment.centerRight,
-                  padding: const EdgeInsets.only(right: 20),
-                  child: const Icon(Icons.delete, color: Colors.white),
-                ),
-                onDismissed: (_) => _deleteFile(entity),
-                child: ListTile(
-                  leading: Icon(
-                    isDirectory ? Icons.folder : Icons.insert_drive_file,
-                    color: isDirectory ? Colors.blue : Colors.grey,
-                  ),
-                  title: Text(path.basename(entity.path)),
-                  subtitle: FutureBuilder<FileStat>(
-                    future: entity.stat(),
-                    builder: (context, snapshot) {
-                      if (!snapshot.hasData) return const SizedBox();
-                      final modified = snapshot.data!.modified;
-                      return Text(
-                        '${modified.day}/${modified.month}/${modified.year}',
-                        style: Theme.of(context).textTheme.bodySmall,
-                      );
-                    },
-                  ),
-                  onTap: () {
-                    if (isDirectory) {
-                      _navigateToDirectory(entity);
-                    }
+                final entities = snapshot.data!;
+                return ListView.builder(
+                  itemCount: entities.length,
+                  itemBuilder: (context, index) {
+                    final entity = entities[index];
+                    final isDirectory = FileSystemEntity.isDirectorySync(entity.path);
+                    final name = entity.path.split('/').last;
+                    final fileSize = _getFileSize(entity);
+
+                    return ListTile(
+                      leading: Icon(
+                        isDirectory ? Icons.folder : Icons.insert_drive_file,
+                        color: isDirectory ? Colors.blue : Colors.grey,
+                      ),
+                      title: Text(name),
+                      subtitle: fileSize.isNotEmpty ? Text(fileSize) : null,
+                      onTap: () => isDirectory ? _navigateToDirectory(entity) : null,
+                      onLongPress: () => _showEntityActions(entity),
+                    );
                   },
-                ),
-              );
-            },
-          );
-        },
-      ),
-    );
-  }
-
-  Future<void> _showCreateFolderDialog() async {
-    final controller = TextEditingController();
-    return showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Create Folder'),
-        content: TextField(
-          controller: controller,
-          decoration: const InputDecoration(hintText: 'Folder name'),
-          autofocus: true,
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () {
-              _createFolder(controller.text);
-              Navigator.pop(context);
-            },
-            child: const Text('Create'),
-          ),
-        ],
-      ),
+                );
+              },
+            ),
     );
   }
 }
