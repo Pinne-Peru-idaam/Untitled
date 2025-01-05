@@ -127,11 +127,7 @@ packages:
     source: hosted
     version: "5.0.0"
   flutter_plugin_android_lifecycle:
-<<<<<<< HEAD
-    dependency: "direct main"
-=======
     dependency: transitive
->>>>>>> 00dce64d13944ce069a5a9fe8dfdffb245932dbe
     description:
       name: flutter_plugin_android_lifecycle
       sha256: "615a505aef59b151b46bbeef55b36ce2b6ed299d160c51d84281946f0aa0ce0e"
@@ -557,17 +553,10 @@ packages:
     dependency: transitive
     description:
       name: win32
-<<<<<<< HEAD
       sha256: "154360849a56b7b67331c21f09a386562d88903f90a1099c5987afc1912e1f29"
       url: "https://pub.dev"
     source: hosted
     version: "5.10.0"
-=======
-      sha256: "8b338d4486ab3fbc0ba0db9f9b4f5239b6697fcee427939a40e720cbb9ee0a69"
-      url: "https://pub.dev"
-    source: hosted
-    version: "5.9.0"
->>>>>>> 00dce64d13944ce069a5a9fe8dfdffb245932dbe
   xdg_directories:
     dependency: transitive
     description:

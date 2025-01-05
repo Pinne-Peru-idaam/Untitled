@@ -1,11 +1,21 @@
 import 'package:flutter/material.dart';
 import 'pages/home/home_page.dart'; // Importing the HomePage class
+import 'package:permission_handler/permission_handler.dart';
 
 // lib/main.dart
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Future.delayed(Duration(milliseconds: 100));
-  runApp(MyApp());
+  
+  // Request permissions
+  await [
+    Permission.storage,
+    Permission.manageExternalStorage,
+    Permission.photos,
+    Permission.videos,
+    Permission.audio,
+  ].request();
+  
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
