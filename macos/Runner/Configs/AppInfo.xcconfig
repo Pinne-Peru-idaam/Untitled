@@ -11,4 +11,8 @@ PRODUCT_NAME = untitle
 PRODUCT_BUNDLE_IDENTIFIER = com.example.untitle
 
 // The copyright displayed in application information
+<<<<<<< HEAD
 PRODUCT_COPYRIGHT = Copyright © 2025 com.example. All rights reserved.
+=======
+PRODUCT_COPYRIGHT = Copyright © 2024 com.example. All rights reserved.
+>>>>>>> 00dce64d13944ce069a5a9fe8dfdffb245932dbe
